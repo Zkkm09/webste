@@ -518,39 +518,29 @@ checkoutBtn.addEventListener("click", () => {
   }
 
   const phone = document.getElementById("userPhone").value.trim() || "لم يتم إدخال رقم";
-  const notes = document.getElementById("orderNotes").value.trim() || "لا توجد ملاحظات";
-  const coupon = document.getElementById("couponCode").value.trim() || "لا يوجد كود";
   const now = new Date();
 
-  let receipt = `📄 *فاتورة طلبك*\n🕒 الوقت: ${now.toLocaleString()}\n`;
-  receipt += `📞 رقم الهاتف: ${phone}\n`;
-  if (deliveryType.includes("توصيل")) receipt += `🏠 الموقع: ${locationInput}\n`;
-  receipt += `🚚 طريقة التوصيل: ${deliveryType}\n`;
-  receipt += `🏷️ كود الخصم: ${coupon}\n`;
-  receipt += `📝 ملاحظات: ${notes}\n\n🛍️ *المنتجات:*\n`;
+  let receipt = `فاتورة الطلب:\n`;
+  receipt += `• الوقت: ${now.toLocaleString()}\n`;
+  receipt += `• رقم الهاتف: ${phone}\n`;
+  receipt += `• الموقع: ${locationInput || 'لم يتم إدخال موقع'}\n`;
+  receipt += `• طريقة التوصيل: ${deliveryType}\n\n`;
 
+  receipt += `المنتجات:\n`;
   let subtotal = 0;
   cart.forEach(item => {
     const itemTotal = item.qty * item.price;
     subtotal += itemTotal;
-    receipt += `- ${item.title}\n  الوصف: ${item.description || 'لا يوجد'}\n  السعر للوحدة: ${item.price}$\n  الكمية: ${item.qty}\n  المجموع: ${itemTotal}$\n`;
+    receipt += `• ${item.title} - ${item.price}$ - ${item.qty} - ${itemTotal}$\n`;
   });
 
-  receipt += `\n💰 *المجموع الفرعي:* ${subtotal}$\n💵 *رسوم التوصيل:* ${selectedDeliveryFee}$\n💰 *الإجمالي:* ${subtotal + selectedDeliveryFee}$`;
+  receipt += `\n-المجموع الفرعي: ${subtotal}$\n`;
+  receipt += `-رسوم التوصيل: ${selectedDeliveryFee}$\n`;
+  receipt += `-الإجمالي: ${subtotal + selectedDeliveryFee}$`;
 
   const encodedReceipt = encodeURIComponent(receipt);
   window.open(`https://wa.me/9647881552046?text=${encodedReceipt}`, "_blank");
 });
-// Price filter
-document.getElementById("priceFilterBtn").addEventListener("click", () => {
-  const min = parseFloat(document.getElementById("minPrice").value) || 0;
-  const max = parseFloat(document.getElementById("maxPrice").value) || Infinity;
-  products.forEach(p => {
-    const price = parseFloat(p.querySelector(".price").innerText.replace("$",""));
-    p.style.display = (price >= min && price <= max) ? "block" : "none";
-  });
-});
-
 // Update cart function
 function updateCart() {
   cartContainer.innerHTML = '';
@@ -638,6 +628,7 @@ function showToast(msg) {
 </script>
 </body>
 </html>
+
 
 
 

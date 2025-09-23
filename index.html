@@ -151,7 +151,12 @@ header .search.active i {
   </div>
 
   <hr class="divider">
-
+<div style="padding:10px 16px;">
+  <label>فلترة بالسعر:</label>
+  <input type="number" id="minPrice" placeholder="من" style="width:80px; padding:6px; margin:0 4px;">
+  <input type="number" id="maxPrice" placeholder="إلى" style="width:80px; padding:6px; margin:0 4px;">
+  <button id="priceFilterBtn" style="padding:6px 12px; border:none; border-radius:6px; background:var(--color-primary); color:white;">تصفية</button>
+</div>
   <div class="products">
     <div class="product" data-category="electronics">
       <img src="./images/logo.png" alt="هاتف ذكي">
@@ -193,11 +198,35 @@ header .search.active i {
   <h2>🛒 السلة</h2>
   <div class="cart-container" id="cartContainer"></div>
 
-  <div style="margin:16px;">
-    <label for="userLocation" style="font-weight:bold;">موقع منزلكم:</label>
-    <input type="text" id="userLocation" placeholder="أدخل موقعك" required
-           style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;">
-  </div>
+<div style="margin:16px;">
+  <label for="userLocation" style="font-weight:bold;">موقع منزلكم:</label>
+  <input type="text" id="userLocation" placeholder="أدخل موقعك"
+         style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;">
+</div>
+
+<div style="margin:16px;">
+  <label for="couponCode" style="font-weight:bold;">كود الخصم:</label>
+  <input type="text" id="couponCode" placeholder="أدخل الكود"
+         style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;">
+</div>
+
+<div style="margin:16px;">
+  <label for="userPhone" style="font-weight:bold;">رقم الهاتف:</label>
+  <input type="tel" id="userPhone" placeholder="07XXXXXXXX"
+         style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;">
+</div>
+
+<div style="margin:16px;">
+  <label for="orderNotes" style="font-weight:bold;">ملاحظات:</label>
+  <textarea id="orderNotes" placeholder="أدخل ملاحظاتك"
+         style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;"></textarea>
+</div>
+
+<div style="margin:16px;">
+  <label for="mapLocation" style="font-weight:bold;">موقعك على الخريطة (Google Maps):</label>
+  <input type="url" id="mapLocation" placeholder="ضع رابط Google Maps"
+         style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;">
+</div>
 
   <div style="margin:16px;">
     <label style="font-weight:bold; display:block; margin-bottom:6px;">طريقة التوصيل:</label>
@@ -224,7 +253,13 @@ header .search.active i {
 
 <nav>
   <div class="nav-item active" data-target="home"><div class="icon"><i class="fas fa-home"></i></div><span>الرئيسية</span></div>
-  <div class="nav-item" data-target="cart"><div class="icon"><i class="fas fa-shopping-cart"></i></div><span>السلة</span></div>
+<div class="nav-item" data-target="cart">
+  <div class="icon" style="position:relative;">
+    <i class="fas fa-shopping-cart"></i>
+    <span id="cartBadge" style="position:absolute; top:-6px; right:-6px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; display:none;">0</span>
+  </div>
+  <span>السلة</span>
+</div>
   <div class="nav-item" data-target="profile"><div class="icon"><i class="fas fa-user"></i></div><span>معلوماتي</span></div>
 </nav>
 
@@ -235,7 +270,14 @@ header .search.active i {
     <span id="popupTitle"></span>
     <span class="description" id="popupDesc"></span>
     <span class="price" id="popupPrice"></span>
-    <button id="popupAddCart">اضف للسلة</button>
+
+<div style="margin:10px 0;">
+  <label style="font-weight:bold;">الكمية:</label>
+  <input type="number" id="popupQty" value="1" min="1"
+         style="width:80px; padding:6px; margin-top:4px; border-radius:6px; border:1px solid #ccc; text-align:center;">
+</div>
+
+<button id="popupAddCart">اضف للسلة</button>
   </div>
 </div>
 
@@ -367,19 +409,29 @@ products.forEach(product => {
     const exists = cart.find(i=>i.title===title);
     if(exists){ exists.qty++; } else { cart.push({title,img,price,qty:1}); }
     updateCart();
-    alert(title + " تم إضافته إلى السلة!");
+showToast(title + " تمت إضافته للسلة ✔️");
   });
 });
 
 popupClose.addEventListener("click", () => popupOverlay.classList.remove("show"));
 popupOverlay.addEventListener("click", e => { if(e.target===popupOverlay) popupOverlay.classList.remove("show"); });
 popupAddCart.addEventListener("click", () => {
-  const exists = cart.find(i=>i.title===popupTitle.innerText);
-  if(exists){ exists.qty++; } else { cart.push({title:popupTitle.innerText,img:popupImg.src,price:parseFloat(popupPrice.innerText.replace("$","")),qty:1}); }
+  const qty = parseInt(document.getElementById("popupQty").value) || 1;
+  const exists = cart.find(i => i.title === popupTitle.innerText);
+  if (exists) {
+    exists.qty += qty;
+  } else {
+    cart.push({
+      title: popupTitle.innerText,
+      img: popupImg.src,
+      price: parseFloat(popupPrice.innerText.replace("$","")),
+      qty: qty
+    });
+  }
   updateCart();
   popupOverlay.classList.remove("show");
+  showToast(popupTitle.innerText + " تمت إضافته للسلة ✔️");
 });
-
 // Search
 const searchToggle = document.getElementById("searchToggle");
 const searchInput = document.getElementById("searchInput");
@@ -449,8 +501,39 @@ checkoutBtn.addEventListener("click", () => {
 });
 
 updateCart();
+  document.getElementById("priceFilterBtn").addEventListener("click", () => {
+  const min = parseFloat(document.getElementById("minPrice").value) || 0;
+  const max = parseFloat(document.getElementById("maxPrice").value) || Infinity;
+  products.forEach(p => {
+    const price = parseFloat(p.querySelector(".price").innerText.replace("$",""));
+    p.style.display = (price >= min && price <= max) ? "block" : "none";
+  });
+});
+  const cartBadge = document.getElementById("cartBadge");
+const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+cartBadge.innerText = totalItems;
+cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
+</script>
+  <div id="toast" style="
+  visibility:hidden; min-width:200px; background:#333; color:#fff;
+  text-align:center; border-radius:8px; padding:12px; position:fixed;
+  bottom:80px; right:50%; transform:translateX(50%);
+  z-index:5000; font-size:14px; opacity:0; transition:opacity 0.5s;">
+</div>
+<script>
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.innerText = msg;
+  toast.style.visibility = "visible";
+  toast.style.opacity = "1";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.style.visibility = "hidden", 500);
+  }, 2000);
+}
 </script>
 </body>
 </html>
+
 
 

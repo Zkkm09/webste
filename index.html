@@ -581,7 +581,7 @@ searchInput.addEventListener("input", () => {
   });
 });
 
-/* ==============================
+/* ============================== 
    💳 Checkout Section
 ================================= */
 checkoutBtn.addEventListener("click", () => {
@@ -599,26 +599,39 @@ checkoutBtn.addEventListener("click", () => {
     return;
   }
 
-  const phone = document.getElementById("userPhone").value.trim() || "لم يتم إدخال رقم";
+  const phone = document.getElementById("userPhone")?.value.trim() || "لم يتم إدخال رقم";
   const now = new Date();
 
-  let receipt = `فاتورة الطلب:\n`;
-  receipt += `• الوقت: ${now.toLocaleString()}\n`;
-  receipt += `• رقم الهاتف: ${phone}\n`;
-  receipt += `• الموقع: ${locationInput || 'لم يتم إدخال موقع'}\n`;
-  receipt += `• طريقة التوصيل: ${deliveryType}\n\n`;
+  // Example discount settings
+  const discountCode = "SUMMER10";  // Example discount code
+  const discountRate = 0.10;        // 10% discount
 
-  receipt += `المنتجات:\n`;
-  let subtotal = 0;
+  let subtotalBeforeDiscount = 0;
   cart.forEach(item => {
-    const itemTotal = item.qty * item.price;
-    subtotal += itemTotal;
-    receipt += `• ${item.title} - ${item.price}$ - ${item.qty} - ${itemTotal}$\n`;
+    subtotalBeforeDiscount += item.price * item.qty;
   });
 
-  receipt += `\n-المجموع الفرعي: ${subtotal}$\n`;
-  receipt += `-رسوم التوصيل: ${selectedDeliveryFee}$\n`;
-  receipt += `-الإجمالي: ${subtotal + selectedDeliveryFee}$`;
+  const discountAmount = subtotalBeforeDiscount * discountRate;
+  const subtotalAfterDiscount = subtotalBeforeDiscount - discountAmount;
+
+  let receipt = `📄 فاتورة الطلب\n`;
+  receipt += `🕒 الوقت: ${now.toLocaleString()}\n`;
+  receipt += `📱 رقم الهاتف: ${phone}\n`;
+  receipt += `🏠 الموقع: ${locationInput || 'لم يتم إدخال موقع'}\n`;
+  receipt += `🚚 طريقة التوصيل: ${deliveryType}\n\n`;
+
+  receipt += `🛍️ المنتجات:\n`;
+  cart.forEach(item => {
+    const itemTotal = item.price * item.qty;
+    receipt += `• ${item.title} - ${item.price}$ × ${item.qty} = ${itemTotal}$\n`;
+  });
+
+  receipt += `\nالمجموع الفرعي (قبل الخصم): ${subtotalBeforeDiscount.toFixed(2)}$\n`;
+  receipt += `كود الخصم: ${discountCode}\n`;
+  receipt += `الخصم: ${discountAmount.toFixed(2)}$\n`;
+  receipt += `المجموع الفرعي (بعد الخصم): ${subtotalAfterDiscount.toFixed(2)}$\n`;
+  receipt += `رسوم التوصيل: ${selectedDeliveryFee}$\n`;
+  receipt += `الإجمالي: ${(subtotalAfterDiscount + selectedDeliveryFee).toFixed(2)}$`;
 
   const encodedReceipt = encodeURIComponent(receipt);
   window.open(`https://wa.me/9647881552046?text=${encodedReceipt}`, "_blank");

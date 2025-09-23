@@ -203,6 +203,16 @@ header .search.active i {
   <input type="text" id="userLocation" placeholder="أدخل موقعك"
          style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;">
 </div>
+  <div style="margin:16px;">
+  <label for="mapLocation" style="font-weight:bold;">موقعك على الخريطة (Google Maps):</label>
+  <div style="display:flex; gap:6px;">
+    <input type="url" id="mapLocation" placeholder="سيتم إدراج رابط الموقع تلقائيًا"
+           style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
+    <button id="getLocationBtn" style="padding:10px 12px; border:none; border-radius:8px; background:var(--color-primary); color:white; cursor:pointer;">
+      📍 موقعي
+    </button>
+  </div>
+</div>
 
 <div style="margin:16px;">
   <label for="couponCode" style="font-weight:bold;">كود الخصم:</label>
@@ -282,6 +292,33 @@ header .search.active i {
 </div>
 
 <script>
+  const getLocationBtn = document.getElementById("getLocationBtn");
+const mapLocationInput = document.getElementById("mapLocation");
+
+getLocationBtn.addEventListener("click", () => {
+  if (navigator.geolocation) {
+    getLocationBtn.disabled = true;
+    getLocationBtn.innerText = "جاري تحديد الموقع...";
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
+        mapLocationInput.value = mapsLink;
+        showToast("تم تحديد موقعك بنجاح ✔️");
+        getLocationBtn.disabled = false;
+        getLocationBtn.innerText = "📍 موقعي";
+      },
+      (error) => {
+        alert("لم نتمكن من تحديد موقعك. يرجى تفعيل خدمات الموقع.");
+        getLocationBtn.disabled = false;
+        getLocationBtn.innerText = "📍 موقعي";
+      }
+    );
+  } else {
+    alert("متصفحك لا يدعم ميزة تحديد الموقع.");
+  }
+});
 // Navbar
 const navItems = document.querySelectorAll(".nav-item");
 const pages = document.querySelectorAll(".page");
@@ -597,6 +634,7 @@ function showToast(msg) {
 </script>
 </body>
 </html>
+
 
 
 

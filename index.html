@@ -415,13 +415,29 @@ searchInput.addEventListener("input", () => {
 // Checkout
 const checkoutBtn = document.getElementById("checkoutBtn");
 checkoutBtn.addEventListener("click", () => {
+  const activeDelivery = document.querySelector(".delivery-btn.active");
+  const deliveryType = activeDelivery.innerText.trim();
+
+  // فقط اذا كانت توصيل اطلب الموقع
   const locationInput = document.getElementById("userLocation").value.trim();
-  if (!locationInput) { alert("يرجى إدخال موقع منزلكم قبل الدفع."); return; }
-  if (cart.length === 0) { alert("سلتك فارغة!"); return; }
+  if (deliveryType.includes("توصيل") && !locationInput) {
+    alert("يرجى إدخال موقع منزلكم قبل الدفع.");
+    return;
+  }
+
+  if (cart.length === 0) {
+    alert("سلتك فارغة!");
+    return;
+  }
 
   const now = new Date();
-  let receipt = `📄 *فاتورة طلبك*\n🕒 الوقت: ${now.toLocaleString()}\n🏠 الموقع: ${locationInput}\n🚚 التوصيل: ${document.querySelector(".delivery-btn.active div").innerText}\n\n🛍️ *المنتجات:*\n`;
-  let subtotal = 0;
+  let receipt = `📄 *فاتورة طلبك*\n🕒 الوقت: ${now.toLocaleString()}\n`;
+
+  if (deliveryType.includes("توصيل")) {
+    receipt += `🏠 الموقع: ${locationInput}\n`;
+  }
+
+  receipt += `🚚 التوصيل: ${deliveryType}\n\n🛍️ *المنتجات:*\n`;  let subtotal = 0;
   cart.forEach(item => {
     const itemTotal = item.qty * item.price;
     subtotal += itemTotal;
@@ -436,4 +452,5 @@ updateCart();
 </script>
 </body>
 </html>
+
 

@@ -500,8 +500,8 @@ checkoutBtn.addEventListener("click", () => {
   window.open(`https://wa.me/9647881552046?text=${encodedReceipt}`, "_blank");
 });
 
-updateCart();
-  document.getElementById("priceFilterBtn").addEventListener("click", () => {
+// Price filter
+document.getElementById("priceFilterBtn").addEventListener("click", () => {
   const min = parseFloat(document.getElementById("minPrice").value) || 0;
   const max = parseFloat(document.getElementById("maxPrice").value) || Infinity;
   products.forEach(p => {
@@ -509,11 +509,74 @@ updateCart();
     p.style.display = (price >= min && price <= max) ? "block" : "none";
   });
 });
+
+// Update cart function
+function updateCart() {
+  cartContainer.innerHTML = '';
+  let subtotal = 0;
+
+  products.forEach(product => {
+    const title = product.querySelector(".title").innerText;
+    const cartBtn = product.querySelector(".cart-btn");
+    const inCart = cart.find(i => i.title === title);
+    cartBtn.style.background = inCart ? "green" : "var(--color-primary)";
+  });
+
+  cart.forEach((item, index) => {
+    const itemTotal = item.qty * item.price;
+    subtotal += itemTotal;
+
+    const cartItem = document.createElement('div');
+    cartItem.className = 'cart-item';
+    cartItem.innerHTML = `
+      <button class="remove-btn">&times;</button>
+      <img src="${item.img}" alt="${item.title}">
+      <div class="cart-details">
+        <span class="cart-title">${item.title}</span>
+        <div class="cart-qty-price">
+          <div class="quantity">
+            <button class="qty-btn minus">-</button>
+            <input type="number" value="${item.qty}" min="1">
+            <button class="qty-btn plus">+</button>
+          </div>
+          <span class="cart-price">${itemTotal}$</span>
+        </div>
+      </div>
+    `;
+
+    const qtyInput = cartItem.querySelector("input");
+    const minusBtn = cartItem.querySelector(".minus");
+    const plusBtn = cartItem.querySelector(".plus");
+    const removeBtn = cartItem.querySelector(".remove-btn");
+
+    minusBtn.addEventListener("click", () => { if(item.qty>1){ item.qty--; updateCart(); } });
+    plusBtn.addEventListener("click", () => { item.qty++; updateCart(); });
+    qtyInput.addEventListener("change", () => { item.qty = parseInt(qtyInput.value)||1; updateCart(); });
+
+    removeBtn.addEventListener("click", () => {
+      if(confirm(`هل أنت متأكد من إزالة "${item.title}" من السلة؟`)){
+        cart.splice(index, 1);
+        updateCart();
+      }
+    });
+
+    cartContainer.appendChild(cartItem);
+  });
+
+  // Update subtotal and totals
+  subtotalPriceEl.innerText = subtotal + "$";
+  deliveryFeeEl.innerText = selectedDeliveryFee + "$";
+  totalPriceEl.innerText = (subtotal + selectedDeliveryFee) + "$";
+
+  // Update cart badge
   const cartBadge = document.getElementById("cartBadge");
-const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-cartBadge.innerText = totalItems;
-cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
-</script>
+  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+  cartBadge.innerText = totalItems;
+  cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
+}
+
+// Call once initially
+updateCart();</script>
   <div id="toast" style="
   visibility:hidden; min-width:200px; background:#333; color:#fff;
   text-align:center; border-radius:8px; padding:12px; position:fixed;
@@ -534,6 +597,7 @@ function showToast(msg) {
 </script>
 </body>
 </html>
+
 
 
 

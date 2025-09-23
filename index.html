@@ -202,11 +202,10 @@ header .search.active i {
   <label for="userLocation" style="font-weight:bold;">موقع منزلكم:</label>
   <input type="text" id="userLocation" placeholder="أدخل موقعك"
          style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;">
-</div>
-  <div style="margin:16px;">
-  <label for="mapLocation" style="font-weight:bold;">موقعك على الخريطة (Google Maps):</label>
+<div style="margin:16px;">
+  <label for="userLocation" style="font-weight:bold;">موقعك:</label>
   <div style="display:flex; gap:6px;">
-    <input type="url" id="mapLocation" placeholder="سيتم إدراج رابط الموقع تلقائيًا"
+    <input type="text" id="userLocation" placeholder="أدخل موقعك أو استخدم موقعي"
            style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
     <button id="getLocationBtn" style="padding:10px 12px; border:none; border-radius:8px; background:var(--color-primary); color:white; cursor:pointer;">
       📍 موقعي
@@ -293,7 +292,7 @@ header .search.active i {
 
 <script>
   const getLocationBtn = document.getElementById("getLocationBtn");
-const mapLocationInput = document.getElementById("mapLocation");
+const userLocationInput = document.getElementById("userLocation");
 
 getLocationBtn.addEventListener("click", () => {
   if (navigator.geolocation) {
@@ -304,7 +303,7 @@ getLocationBtn.addEventListener("click", () => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
-        mapLocationInput.value = mapsLink;
+        userLocationInput.value = mapsLink;
         showToast("تم تحديد موقعك بنجاح ✔️");
         getLocationBtn.disabled = false;
         getLocationBtn.innerText = "📍 موقعي";
@@ -628,6 +627,7 @@ function showToast(msg) {
 </script>
 </body>
 </html>
+
 
 
 

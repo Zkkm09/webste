@@ -115,6 +115,7 @@ header .search.active i {
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
 }
+
 </style>
 </head>
 <body>
@@ -209,11 +210,26 @@ header .search.active i {
   </div>
 </div>
 
+<!-- ✅ Coupon Input Section -->
 <div style="margin:16px;">
   <label for="couponCode" style="font-weight:bold;">كود الخصم:</label>
-  <input type="text" id="couponCode" placeholder="أدخل الكود"
-         style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;">
+  <div style="display:flex; gap:6px; margin-top:6px;">
+    <input type="text" id="couponCode" placeholder="أدخل الكود"
+           style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
+    <button id="applyCouponBtn" style="padding:10px 14px; border:none; border-radius:8px; background:var(--color-primary); color:white; cursor:pointer;">
+      تطبيق
+    </button>
+  </div>
+
+<!-- ✅ Active Coupon Display -->
+<div id="activeCoupon" 
+     style="margin-top:10px; background:#e0f2fe; color:#1e3a8a; padding:8px 12px; border-radius:8px; display:none; justify-content:space-between; align-items:center;">
+  <span id="activeCouponText"></span>
+  <i class="fas fa-times" id="removeCoupon" style="cursor:pointer; color:red;"></i>
 </div>
+
+
+
 
 <div style="margin:16px;">
   <label for="userPhone" style="font-weight:bold;">رقم الهاتف:</label>
@@ -236,10 +252,13 @@ header .search.active i {
   </div>
 
   <div class="cart-summary">
-    <div><span>المجموع الفرعي:</span><span id="subtotalPrice">0$</span></div>
-    <div><span>رسوم التوصيل:</span><span id="deliveryFee">0$</span></div>
-    <div class="total"><span>الإجمالي:</span><span id="totalPrice">0$</span></div>
+  <div><span>المجموع الفرعي (قبل الخصم):</span><span id="originalSubtotal">0$</span></div>
+  <div><span>الخصم:</span><span id="discountAmount">0$</span></div>
+  <div><span>المجموع الفرعي (بعد الخصم):</span><span id="subtotalPrice">0$</span></div>
+  <div><span>رسوم التوصيل:</span><span id="deliveryFee">0$</span></div>
+  <div class="total"><span>الإجمالي:</span><span id="totalPrice">0$</span></div>
   </div>
+
 
   <button class="checkout-btn" id="checkoutBtn">الانتقال للدفع</button>
 </section>
@@ -281,7 +300,10 @@ header .search.active i {
 </div>
 
 <script>
-  const getLocationBtn = document.getElementById("getLocationBtn");
+/* ==============================
+   📍 Location Section
+================================= */
+const getLocationBtn = document.getElementById("getLocationBtn");
 const userLocationInput = document.getElementById("userLocation");
 
 getLocationBtn.addEventListener("click", () => {
@@ -298,7 +320,7 @@ getLocationBtn.addEventListener("click", () => {
         getLocationBtn.disabled = false;
         getLocationBtn.innerText = "📍 موقعي";
       },
-      (error) => {
+      () => {
         alert("لم نتمكن من تحديد موقعك. يرجى تفعيل خدمات الموقع.");
         getLocationBtn.disabled = false;
         getLocationBtn.innerText = "📍 موقعي";
@@ -308,7 +330,10 @@ getLocationBtn.addEventListener("click", () => {
     alert("متصفحك لا يدعم ميزة تحديد الموقع.");
   }
 });
-// Navbar
+
+/* ==============================
+   🧭 Navbar Section
+================================= */
 const navItems = document.querySelectorAll(".nav-item");
 const pages = document.querySelectorAll(".page");
 navItems.forEach(item => {
@@ -320,7 +345,9 @@ navItems.forEach(item => {
   });
 });
 
-// Categories filter
+/* ==============================
+   🏷 Categories Filter
+================================= */
 const categories = document.querySelectorAll(".category");
 const products = document.querySelectorAll(".product");
 categories.forEach(cat => {
@@ -332,7 +359,9 @@ categories.forEach(cat => {
   });
 });
 
-// Cart
+/* ==============================
+   🛒 Cart Section
+================================= */
 const cartContainer = document.getElementById("cartContainer");
 const subtotalPriceEl = document.getElementById("subtotalPrice");
 const deliveryFeeEl = document.getElementById("deliveryFee");
@@ -340,11 +369,13 @@ const totalPriceEl = document.getElementById("totalPrice");
 const deliveryBtns = document.querySelectorAll(".delivery-btn");
 let selectedDeliveryFee = 5;
 let cart = [];
+let discountPercent = 0;
 
 function updateCart() {
   cartContainer.innerHTML = '';
   let subtotal = 0;
 
+  // Update product buttons
   products.forEach(product => {
     const title = product.querySelector(".title").innerText;
     const cartBtn = product.querySelector(".cart-btn");
@@ -352,6 +383,7 @@ function updateCart() {
     cartBtn.style.background = inCart ? "green" : "var(--color-primary)";
   });
 
+  // Render cart items
   cart.forEach((item,index) => {
     const itemTotal = item.qty * item.price;
     subtotal += itemTotal;
@@ -391,96 +423,73 @@ function updateCart() {
     cartContainer.appendChild(cartItem);
   });
 
-  subtotalPriceEl.innerText = subtotal + "$";
-  deliveryFeeEl.innerText = selectedDeliveryFee + "$";
-  totalPriceEl.innerText = (subtotal + selectedDeliveryFee) + "$";
-}
-const couponInput = document.getElementById("couponCode");
-let discountPercent = 0;
+// Apply discount
+const discountAmount = subtotal * (discountPercent / 100);
+const discountedSubtotal = subtotal - discountAmount;
 
-couponInput.addEventListener("change", () => {
-  const code = couponInput.value.trim().toUpperCase();
-  
-  if(code === "TEST10") {  // 10% off test code
-    discountPercent = 10; 
-    showToast("تم تطبيق كود الخصم 10% ✔️");
-  } else if(code === "TEST20") { // 20% off test code
-    discountPercent = 20;
-    showToast("تم تطبيق كود الخصم 20% ✔️");
-  } else {
-    discountPercent = 0;
-    showToast("كود الخصم غير صالح ❌");
-  }
-  updateCart();
-});
+// Update totals
+document.getElementById("originalSubtotal").innerText = subtotal.toFixed(2) + "$";
+document.getElementById("discountAmount").innerText = discountAmount.toFixed(2) + "$";
+subtotalPriceEl.innerText = discountedSubtotal.toFixed(2) + "$";
+deliveryFeeEl.innerText = selectedDeliveryFee + "$";
+totalPriceEl.innerText = (discountedSubtotal + selectedDeliveryFee).toFixed(2) + "$";
 
-// Update updateCart totals
-function updateCart() {
-  cartContainer.innerHTML = '';
-  let subtotal = 0;
-
-  products.forEach(product => {
-    const title = product.querySelector(".title").innerText;
-    const cartBtn = product.querySelector(".cart-btn");
-    const inCart = cart.find(i => i.title === title);
-    cartBtn.style.background = inCart ? "green" : "var(--color-primary)";
-  });
-
-  cart.forEach((item, index) => {
-    const itemTotal = item.qty * item.price;
-    subtotal += itemTotal;
-
-    const cartItem = document.createElement('div');
-    cartItem.className = 'cart-item';
-    cartItem.innerHTML = `
-      <button class="remove-btn">&times;</button>
-      <img src="${item.img}" alt="${item.title}">
-      <div class="cart-details">
-        <span class="cart-title">${item.title}</span>
-        <div class="cart-qty-price">
-          <div class="quantity">
-            <button class="qty-btn minus">-</button>
-            <input type="number" value="${item.qty}" min="1">
-            <button class="qty-btn plus">+</button>
-          </div>
-          <span class="cart-price">${itemTotal}$</span>
-        </div>
-      </div>
-    `;
-
-    const qtyInput = cartItem.querySelector("input");
-    const minusBtn = cartItem.querySelector(".minus");
-    const plusBtn = cartItem.querySelector(".plus");
-    const removeBtn = cartItem.querySelector(".remove-btn");
-
-    minusBtn.addEventListener("click", () => { if(item.qty>1){ item.qty--; updateCart(); } });
-    plusBtn.addEventListener("click", () => { item.qty++; updateCart(); });
-    qtyInput.addEventListener("change", () => { item.qty = parseInt(qtyInput.value)||1; updateCart(); });
-
-    removeBtn.addEventListener("click", () => {
-      if(confirm(`هل أنت متأكد من إزالة "${item.title}" من السلة؟`)){
-        cart.splice(index, 1);
-        updateCart();
-      }
-    });
-
-    cartContainer.appendChild(cartItem);
-  });
-
-  // Apply percentage discount
-  const discountAmount = subtotal * (discountPercent/100);
-  const discountedSubtotal = subtotal - discountAmount;
-
-  subtotalPriceEl.innerText = discountedSubtotal.toFixed(2) + "$";
-  deliveryFeeEl.innerText = selectedDeliveryFee + "$";
-  totalPriceEl.innerText = (discountedSubtotal + selectedDeliveryFee).toFixed(2) + "$";
-
+  // Update cart badge
   const cartBadge = document.getElementById("cartBadge");
   const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
   cartBadge.innerText = totalItems;
   cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
 }
-// Delivery buttons
+
+/* ==============================
+   🎟 Coupon Section (one active at a time)
+================================= */
+const couponInput = document.getElementById("couponCode");
+const applyCouponBtn = document.getElementById("applyCouponBtn");
+const activeCouponBox = document.getElementById("activeCoupon");
+const activeCouponText = document.getElementById("activeCouponText");
+const removeCouponBtn = document.getElementById("removeCoupon");
+
+applyCouponBtn.addEventListener("click", () => {
+  const code = couponInput.value.trim().toUpperCase();
+
+  // Reset first (only one active coupon allowed)
+  discountPercent = 0;
+  activeCouponBox.style.display = "none";
+
+  if (code === "TEST10") {
+    discountPercent = 10;
+    activeCouponText.innerText = `تم تفعيل الكوبون (${code}) - خصم 10%`;
+    activeCouponBox.style.display = "flex";
+    showToast("تم تطبيق كود الخصم 10% ✔️");
+  } else if (code === "TEST20") {
+    discountPercent = 20;
+    activeCouponText.innerText = `تم تفعيل الكوبون (${code}) - خصم 20%`;
+    activeCouponBox.style.display = "flex";
+    showToast("تم تطبيق كود الخصم 20% ✔️");
+  } else {
+    showToast("كود الخصم غير صالح ❌");
+  }
+
+  couponInput.value = ""; // clear input
+  updateCart();
+});
+
+// ❌ Remove coupon
+removeCouponBtn.addEventListener("click", () => {
+  discountPercent = 0;
+  activeCouponBox.style.display = "none";
+  updateCart();
+  showToast("تم إلغاء الكوبون ❌");
+});
+
+
+
+
+
+/* ==============================
+   🚚 Delivery Section
+================================= */
 deliveryBtns.forEach(btn => {
   btn.addEventListener("click", () => {
     deliveryBtns.forEach(b => b.classList.remove("active"));
@@ -490,7 +499,9 @@ deliveryBtns.forEach(btn => {
   });
 });
 
-// Product popup
+/* ==============================
+   🛍 Product Popup
+================================= */
 const popupOverlay = document.getElementById("productPopupOverlay");
 const popupImg = document.getElementById("popupImg");
 const popupTitle = document.getElementById("popupTitle");
@@ -519,7 +530,7 @@ products.forEach(product => {
     const exists = cart.find(i=>i.title===title);
     if(exists){ exists.qty++; } else { cart.push({title,img,price,qty:1}); }
     updateCart();
-showToast(title + " تمت إضافته للسلة ✔️");
+    showToast(title + " تمت إضافته للسلة ✔️");
   });
 });
 
@@ -542,7 +553,10 @@ popupAddCart.addEventListener("click", () => {
   popupOverlay.classList.remove("show");
   showToast(popupTitle.innerText + " تمت إضافته للسلة ✔️");
 });
-// Search
+
+/* ==============================
+   🔍 Search Section
+================================= */
 const searchToggle = document.getElementById("searchToggle");
 const searchInput = document.getElementById("searchInput");
 const searchContainer = document.querySelector("header .search");
@@ -562,19 +576,14 @@ searchToggle.addEventListener("click", () => {
 searchInput.addEventListener("input", () => {
   const query = searchInput.value.toLowerCase();
   products.forEach(p => {
-    const title = p.querySelector(".title").innerText.toLowerCase();
-    p.style.display = title.includes(query) ? "block" : "none";
-  });
-});
-  searchInput.addEventListener('input', () => {
-  const query = searchInput.value.toLowerCase();
-  products.forEach(p => {
     const title = p.querySelector('.title').innerText.toLowerCase();
     p.style.display = title.includes(query)?'block':'none';
   });
 });
 
-// Checkout
+/* ==============================
+   💳 Checkout Section
+================================= */
 checkoutBtn.addEventListener("click", () => {
   const activeDelivery = document.querySelector(".delivery-btn.active");
   const deliveryType = activeDelivery.innerText.trim();
@@ -614,80 +623,10 @@ checkoutBtn.addEventListener("click", () => {
   const encodedReceipt = encodeURIComponent(receipt);
   window.open(`https://wa.me/9647881552046?text=${encodedReceipt}`, "_blank");
 });
-// Update cart function
-function updateCart() {
-  cartContainer.innerHTML = '';
-  let subtotal = 0;
 
-  products.forEach(product => {
-    const title = product.querySelector(".title").innerText;
-    const cartBtn = product.querySelector(".cart-btn");
-    const inCart = cart.find(i => i.title === title);
-    cartBtn.style.background = inCart ? "green" : "var(--color-primary)";
-  });
-
-  cart.forEach((item, index) => {
-    const itemTotal = item.qty * item.price;
-    subtotal += itemTotal;
-
-    const cartItem = document.createElement('div');
-    cartItem.className = 'cart-item';
-    cartItem.innerHTML = `
-      <button class="remove-btn">&times;</button>
-      <img src="${item.img}" alt="${item.title}">
-      <div class="cart-details">
-        <span class="cart-title">${item.title}</span>
-        <div class="cart-qty-price">
-          <div class="quantity">
-            <button class="qty-btn minus">-</button>
-            <input type="number" value="${item.qty}" min="1">
-            <button class="qty-btn plus">+</button>
-          </div>
-          <span class="cart-price">${itemTotal}$</span>
-        </div>
-      </div>
-    `;
-
-    const qtyInput = cartItem.querySelector("input");
-    const minusBtn = cartItem.querySelector(".minus");
-    const plusBtn = cartItem.querySelector(".plus");
-    const removeBtn = cartItem.querySelector(".remove-btn");
-
-    minusBtn.addEventListener("click", () => { if(item.qty>1){ item.qty--; updateCart(); } });
-    plusBtn.addEventListener("click", () => { item.qty++; updateCart(); });
-    qtyInput.addEventListener("change", () => { item.qty = parseInt(qtyInput.value)||1; updateCart(); });
-
-    removeBtn.addEventListener("click", () => {
-      if(confirm(`هل أنت متأكد من إزالة "${item.title}" من السلة؟`)){
-        cart.splice(index, 1);
-        updateCart();
-      }
-    });
-
-    cartContainer.appendChild(cartItem);
-  });
-
-  // Update subtotal and totals
-  subtotalPriceEl.innerText = subtotal + "$";
-  deliveryFeeEl.innerText = selectedDeliveryFee + "$";
-  totalPriceEl.innerText = (subtotal + selectedDeliveryFee) + "$";
-
-  // Update cart badge
-  const cartBadge = document.getElementById("cartBadge");
-  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-  cartBadge.innerText = totalItems;
-  cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
-}
-
-// Call once initially
-updateCart();</script>
-  <div id="toast" style="
-  visibility:hidden; min-width:200px; background:#333; color:#fff;
-  text-align:center; border-radius:8px; padding:12px; position:fixed;
-  bottom:80px; right:50%; transform:translateX(50%);
-  z-index:5000; font-size:14px; opacity:0; transition:opacity 0.5s;">
-</div>
-<script>
+/* ==============================
+   🍞 Toast Function
+================================= */
 function showToast(msg) {
   const toast = document.getElementById("toast");
   toast.innerText = msg;
@@ -698,16 +637,28 @@ function showToast(msg) {
     setTimeout(() => toast.style.visibility = "hidden", 500);
   }, 2000);
 }
+
+/* ==============================
+   🚀 Init
+================================= */
+updateCart();
 </script>
+<div id="toast" style="
+  visibility:hidden;
+  min-width:250px;
+  background:#333;
+  color:#fff;
+  text-align:center;
+  border-radius:8px;
+  padding:12px;
+  position:fixed;
+  bottom:80px;
+  right:50%;
+  transform:translateX(50%);
+  z-index:9999;
+  opacity:0;
+  transition:opacity 0.5s ease;
+"></div>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-

@@ -279,428 +279,271 @@ header .search.active i {
 <button id="popupAddCart">اضف للسلة</button>
   </div>
 </div>
-
 <script>
+  // ===== Geolocation =====
   const getLocationBtn = document.getElementById("getLocationBtn");
-const userLocationInput = document.getElementById("userLocation");
+  const userLocationInput = document.getElementById("userLocation");
 
-getLocationBtn.addEventListener("click", () => {
-  if (navigator.geolocation) {
+  getLocationBtn.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      alert("متصفحك لا يدعم ميزة تحديد الموقع.");
+      return;
+    }
     getLocationBtn.disabled = true;
     getLocationBtn.innerText = "جاري تحديد الموقع...";
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const mapsLink = `https://www.google.com/maps?q=${lat},${lng}`;
-        userLocationInput.value = mapsLink;
+      pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        userLocationInput.value = `https://www.google.com/maps?q=${lat},${lng}`;
         showToast("تم تحديد موقعك بنجاح ✔️");
         getLocationBtn.disabled = false;
         getLocationBtn.innerText = "📍 موقعي";
       },
-      (error) => {
+      () => {
         alert("لم نتمكن من تحديد موقعك. يرجى تفعيل خدمات الموقع.");
         getLocationBtn.disabled = false;
         getLocationBtn.innerText = "📍 موقعي";
       }
     );
-  } else {
-    alert("متصفحك لا يدعم ميزة تحديد الموقع.");
-  }
-});
-// Navbar
-const navItems = document.querySelectorAll(".nav-item");
-const pages = document.querySelectorAll(".page");
-navItems.forEach(item => {
-  item.addEventListener("click", () => {
-    navItems.forEach(i => i.classList.remove("active"));
-    pages.forEach(p => p.classList.remove("active"));
-    item.classList.add("active");
-    document.getElementById(item.dataset.target).classList.add("active");
-  });
-});
-
-// Categories filter
-const categories = document.querySelectorAll(".category");
-const products = document.querySelectorAll(".product");
-categories.forEach(cat => {
-  cat.addEventListener("click", () => {
-    categories.forEach(c => c.classList.remove("active"));
-    cat.classList.add("active");
-    const selected = cat.dataset.category;
-    products.forEach(p => p.style.display = (selected==='all'||p.dataset.category===selected)?'block':'none');
-  });
-});
-
-// Cart
-const cartContainer = document.getElementById("cartContainer");
-const subtotalPriceEl = document.getElementById("subtotalPrice");
-const deliveryFeeEl = document.getElementById("deliveryFee");
-const totalPriceEl = document.getElementById("totalPrice");
-const deliveryBtns = document.querySelectorAll(".delivery-btn");
-let selectedDeliveryFee = 5;
-let cart = [];
-
-function updateCart() {
-  cartContainer.innerHTML = '';
-  let subtotal = 0;
-
-  products.forEach(product => {
-    const title = product.querySelector(".title").innerText;
-    const cartBtn = product.querySelector(".cart-btn");
-    const inCart = cart.find(i => i.title === title);
-    cartBtn.style.background = inCart ? "green" : "var(--color-primary)";
   });
 
-  cart.forEach((item,index) => {
-    const itemTotal = item.qty * item.price;
-    subtotal += itemTotal;
-    const cartItem = document.createElement('div');
-    cartItem.className = 'cart-item';
-    cartItem.innerHTML = `
-      <button class="remove-btn">&times;</button>
-      <img src="${item.img}" alt="${item.title}">
-      <div class="cart-details">
-        <span class="cart-title">${item.title}</span>
-        <div class="cart-qty-price">
-          <div class="quantity">
-            <button class="qty-btn minus">-</button>
-            <input type="number" value="${item.qty}" min="1">
-            <button class="qty-btn plus">+</button>
-          </div>
-          <span class="cart-price">${itemTotal}$</span>
-        </div>
-      </div>
-    `;
-    const qtyInput = cartItem.querySelector("input");
-    const minusBtn = cartItem.querySelector(".minus");
-    const plusBtn = cartItem.querySelector(".plus");
-    const removeBtn = cartItem.querySelector(".remove-btn");
-
-    minusBtn.addEventListener("click", () => { if(item.qty>1){ item.qty--; updateCart(); } });
-    plusBtn.addEventListener("click", () => { item.qty++; updateCart(); });
-    qtyInput.addEventListener("change", () => { item.qty = parseInt(qtyInput.value)||1; updateCart(); });
-
-    removeBtn.addEventListener("click", () => {
-      if(confirm(`هل أنت متأكد من إزالة "${item.title}" من السلة؟`)){
-        cart.splice(index, 1);
-        updateCart();
-      }
+  // ===== Navbar =====
+  const navItems = document.querySelectorAll(".nav-item");
+  const pages = document.querySelectorAll(".page");
+  navItems.forEach(item => {
+    item.addEventListener("click", () => {
+      navItems.forEach(i => i.classList.remove("active"));
+      pages.forEach(p => p.classList.remove("active"));
+      item.classList.add("active");
+      document.getElementById(item.dataset.target).classList.add("active");
     });
-
-    cartContainer.appendChild(cartItem);
   });
 
-  subtotalPriceEl.innerText = subtotal + "$";
-  deliveryFeeEl.innerText = selectedDeliveryFee + "$";
-  totalPriceEl.innerText = (subtotal + selectedDeliveryFee) + "$";
-}
-const couponInput = document.getElementById("couponCode");
-let discountPercent = 0;
-
-couponInput.addEventListener("change", () => {
-  const code = couponInput.value.trim().toUpperCase();
-  
-  if(code === "TEST10") {  // 10% off test code
-    discountPercent = 10; 
-    showToast("تم تطبيق كود الخصم 10% ✔️");
-  } else if(code === "TEST20") { // 20% off test code
-    discountPercent = 20;
-    showToast("تم تطبيق كود الخصم 20% ✔️");
-  } else {
-    discountPercent = 0;
-    showToast("كود الخصم غير صالح ❌");
-  }
-  updateCart();
-});
-
-// Update updateCart totals
-function updateCart() {
-  cartContainer.innerHTML = '';
-  let subtotal = 0;
-
-  products.forEach(product => {
-    const title = product.querySelector(".title").innerText;
-    const cartBtn = product.querySelector(".cart-btn");
-    const inCart = cart.find(i => i.title === title);
-    cartBtn.style.background = inCart ? "green" : "var(--color-primary)";
-  });
-
-  cart.forEach((item, index) => {
-    const itemTotal = item.qty * item.price;
-    subtotal += itemTotal;
-
-    const cartItem = document.createElement('div');
-    cartItem.className = 'cart-item';
-    cartItem.innerHTML = `
-      <button class="remove-btn">&times;</button>
-      <img src="${item.img}" alt="${item.title}">
-      <div class="cart-details">
-        <span class="cart-title">${item.title}</span>
-        <div class="cart-qty-price">
-          <div class="quantity">
-            <button class="qty-btn minus">-</button>
-            <input type="number" value="${item.qty}" min="1">
-            <button class="qty-btn plus">+</button>
-          </div>
-          <span class="cart-price">${itemTotal}$</span>
-        </div>
-      </div>
-    `;
-
-    const qtyInput = cartItem.querySelector("input");
-    const minusBtn = cartItem.querySelector(".minus");
-    const plusBtn = cartItem.querySelector(".plus");
-    const removeBtn = cartItem.querySelector(".remove-btn");
-
-    minusBtn.addEventListener("click", () => { if(item.qty>1){ item.qty--; updateCart(); } });
-    plusBtn.addEventListener("click", () => { item.qty++; updateCart(); });
-    qtyInput.addEventListener("change", () => { item.qty = parseInt(qtyInput.value)||1; updateCart(); });
-
-    removeBtn.addEventListener("click", () => {
-      if(confirm(`هل أنت متأكد من إزالة "${item.title}" من السلة؟`)){
-        cart.splice(index, 1);
-        updateCart();
-      }
+  // ===== Categories Filter =====
+  const categories = document.querySelectorAll(".category");
+  const products = document.querySelectorAll(".product");
+  categories.forEach(cat => {
+    cat.addEventListener("click", () => {
+      categories.forEach(c => c.classList.remove("active"));
+      cat.classList.add("active");
+      const selected = cat.dataset.category;
+      products.forEach(p => p.style.display = (selected === 'all' || p.dataset.category === selected) ? 'block' : 'none');
     });
-
-    cartContainer.appendChild(cartItem);
   });
 
-  // Apply percentage discount
-  const discountAmount = subtotal * (discountPercent/100);
-  const discountedSubtotal = subtotal - discountAmount;
-
-  subtotalPriceEl.innerText = discountedSubtotal.toFixed(2) + "$";
-  deliveryFeeEl.innerText = selectedDeliveryFee + "$";
-  totalPriceEl.innerText = (discountedSubtotal + selectedDeliveryFee).toFixed(2) + "$";
-
+  // ===== Cart =====
+  const cartContainer = document.getElementById("cartContainer");
+  const subtotalPriceEl = document.getElementById("subtotalPrice");
+  const deliveryFeeEl = document.getElementById("deliveryFee");
+  const totalPriceEl = document.getElementById("totalPrice");
+  const deliveryBtns = document.querySelectorAll(".delivery-btn");
   const cartBadge = document.getElementById("cartBadge");
-  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-  cartBadge.innerText = totalItems;
-  cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
-}
-// Delivery buttons
-deliveryBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    deliveryBtns.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    selectedDeliveryFee = parseFloat(btn.dataset.fee);
+  const couponInput = document.getElementById("couponCode");
+
+  let cart = [];
+  let selectedDeliveryFee = 5;
+  let discountPercent = 0;
+
+  // Apply coupon
+  couponInput.addEventListener("change", () => {
+    const code = couponInput.value.trim().toUpperCase();
+    if (code === "TEST10") discountPercent = 10;
+    else if (code === "TEST20") discountPercent = 20;
+    else discountPercent = 0;
+    showToast(discountPercent ? `تم تطبيق كود الخصم ${discountPercent}% ✔️` : "كود الخصم غير صالح ❌");
     updateCart();
   });
-});
 
-// Product popup
-const popupOverlay = document.getElementById("productPopupOverlay");
-const popupImg = document.getElementById("popupImg");
-const popupTitle = document.getElementById("popupTitle");
-const popupDesc = document.getElementById("popupDesc");
-const popupPrice = document.getElementById("popupPrice");
-const popupClose = document.getElementById("popupClose");
-const popupAddCart = document.getElementById("popupAddCart");
-
-products.forEach(product => {
-  const cartBtn = product.querySelector(".cart-btn");
-  const price = parseFloat(product.querySelector(".price").innerText.replace("$",""));
-  const title = product.querySelector(".title").innerText;
-  const img = product.querySelector("img").src;
-
-  product.addEventListener("click", e => {
-    if(e.target.closest(".cart-btn")) return;
-    popupImg.src = img;
-    popupTitle.innerText = title;
-    popupDesc.innerText = product.querySelector(".description").innerText;
-    popupPrice.innerText = product.querySelector(".price").innerText;
-    popupOverlay.classList.add("show");
-  });
-
-  cartBtn.addEventListener("click", e => {
-    e.stopPropagation();
-    const exists = cart.find(i=>i.title===title);
-    if(exists){ exists.qty++; } else { cart.push({title,img,price,qty:1}); }
-    updateCart();
-showToast(title + " تمت إضافته للسلة ✔️");
-  });
-});
-
-popupClose.addEventListener("click", () => popupOverlay.classList.remove("show"));
-popupOverlay.addEventListener("click", e => { if(e.target===popupOverlay) popupOverlay.classList.remove("show"); });
-popupAddCart.addEventListener("click", () => {
-  const qty = parseInt(document.getElementById("popupQty").value) || 1;
-  const exists = cart.find(i => i.title === popupTitle.innerText);
-  if (exists) {
-    exists.qty += qty;
-  } else {
-    cart.push({
-      title: popupTitle.innerText,
-      img: popupImg.src,
-      price: parseFloat(popupPrice.innerText.replace("$","")),
-      qty: qty
+  // Delivery buttons
+  deliveryBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      deliveryBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedDeliveryFee = parseFloat(btn.dataset.fee);
+      updateCart();
     });
-  }
-  updateCart();
-  popupOverlay.classList.remove("show");
-  showToast(popupTitle.innerText + " تمت إضافته للسلة ✔️");
-});
-// Search
-const searchToggle = document.getElementById("searchToggle");
-const searchInput = document.getElementById("searchInput");
-const searchContainer = document.querySelector("header .search");
-
-searchToggle.addEventListener("click", () => {
-  searchContainer.classList.toggle("active");
-  if (searchContainer.classList.contains("active")) {
-    searchInput.focus();
-    searchToggle.classList.replace("fa-search", "fa-times");
-  } else {
-    searchInput.value = "";
-    products.forEach(p => p.style.display = "block");
-    searchToggle.classList.replace("fa-times", "fa-search");
-  }
-});
-
-searchInput.addEventListener("input", () => {
-  const query = searchInput.value.toLowerCase();
-  products.forEach(p => {
-    const title = p.querySelector(".title").innerText.toLowerCase();
-    p.style.display = title.includes(query) ? "block" : "none";
-  });
-});
-  searchInput.addEventListener('input', () => {
-  const query = searchInput.value.toLowerCase();
-  products.forEach(p => {
-    const title = p.querySelector('.title').innerText.toLowerCase();
-    p.style.display = title.includes(query)?'block':'none';
-  });
-});
-
-// Checkout
-checkoutBtn.addEventListener("click", () => {
-  const activeDelivery = document.querySelector(".delivery-btn.active");
-  const deliveryType = activeDelivery.innerText.trim();
-
-  const locationInput = document.getElementById("userLocation").value.trim();
-  if (deliveryType.includes("توصيل") && !locationInput) {
-    alert("يرجى إدخال موقع منزلكم قبل الدفع.");
-    return;
-  }
-
-  if (cart.length === 0) {
-    alert("سلتك فارغة!");
-    return;
-  }
-
-  const phone = document.getElementById("userPhone").value.trim() || "لم يتم إدخال رقم";
-  const now = new Date();
-
-  let receipt = `فاتورة الطلب:\n`;
-  receipt += `• الوقت: ${now.toLocaleString()}\n`;
-  receipt += `• رقم الهاتف: ${phone}\n`;
-  receipt += `• الموقع: ${locationInput || 'لم يتم إدخال موقع'}\n`;
-  receipt += `• طريقة التوصيل: ${deliveryType}\n\n`;
-
-  receipt += `المنتجات:\n`;
-  let subtotal = 0;
-  cart.forEach(item => {
-    const itemTotal = item.qty * item.price;
-    subtotal += itemTotal;
-    receipt += `• ${item.title} - ${item.price}$ - ${item.qty} - ${itemTotal}$\n`;
   });
 
-  receipt += `\n-المجموع الفرعي: ${subtotal}$\n`;
-  receipt += `-رسوم التوصيل: ${selectedDeliveryFee}$\n`;
-  receipt += `-الإجمالي: ${subtotal + selectedDeliveryFee}$`;
+  // ===== Update Cart =====
+  function updateCart() {
+    cartContainer.innerHTML = '';
+    let subtotal = 0;
 
-  const encodedReceipt = encodeURIComponent(receipt);
-  window.open(`https://wa.me/9647881552046?text=${encodedReceipt}`, "_blank");
-});
-// Update cart function
-function updateCart() {
-  cartContainer.innerHTML = '';
-  let subtotal = 0;
+    // Update cart buttons
+    products.forEach(product => {
+      const title = product.querySelector(".title").innerText;
+      const cartBtn = product.querySelector(".cart-btn");
+      cartBtn.style.background = cart.find(i => i.title === title) ? "green" : "var(--color-primary)";
+    });
+
+    // Cart items
+    cart.forEach((item, index) => {
+      const itemTotal = item.qty * item.price;
+      subtotal += itemTotal;
+
+      const cartItem = document.createElement('div');
+      cartItem.className = 'cart-item';
+      cartItem.innerHTML = `
+        <button class="remove-btn">&times;</button>
+        <img src="${item.img}" alt="${item.title}">
+        <div class="cart-details">
+          <span class="cart-title">${item.title}</span>
+          <div class="cart-qty-price">
+            <div class="quantity">
+              <button class="qty-btn minus">-</button>
+              <input type="number" value="${item.qty}" min="1">
+              <button class="qty-btn plus">+</button>
+            </div>
+            <span class="cart-price">${itemTotal.toFixed(2)}$</span>
+          </div>
+        </div>
+      `;
+
+      const qtyInput = cartItem.querySelector("input");
+      const minusBtn = cartItem.querySelector(".minus");
+      const plusBtn = cartItem.querySelector(".plus");
+      const removeBtn = cartItem.querySelector(".remove-btn");
+
+      minusBtn.addEventListener("click", () => { if(item.qty>1){ item.qty--; updateCart(); } });
+      plusBtn.addEventListener("click", () => { item.qty++; updateCart(); });
+      qtyInput.addEventListener("change", () => { item.qty = parseInt(qtyInput.value) || 1; updateCart(); });
+      removeBtn.addEventListener("click", () => {
+        if(confirm(`هل أنت متأكد من إزالة "${item.title}" من السلة؟`)){
+          cart.splice(index, 1);
+          updateCart();
+        }
+      });
+
+      cartContainer.appendChild(cartItem);
+    });
+
+    // Apply discount
+    const discountAmount = subtotal * (discountPercent / 100);
+    const discountedSubtotal = subtotal - discountAmount;
+
+    subtotalPriceEl.innerText = discountedSubtotal.toFixed(2) + "$";
+    deliveryFeeEl.innerText = selectedDeliveryFee + "$";
+    totalPriceEl.innerText = (discountedSubtotal + selectedDeliveryFee).toFixed(2) + "$";
+
+    // Cart badge
+    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+    cartBadge.innerText = totalItems;
+    cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
+  }
+
+  // ===== Product Popup =====
+  const popupOverlay = document.getElementById("productPopupOverlay");
+  const popupImg = document.getElementById("popupImg");
+  const popupTitle = document.getElementById("popupTitle");
+  const popupDesc = document.getElementById("popupDesc");
+  const popupPrice = document.getElementById("popupPrice");
+  const popupClose = document.getElementById("popupClose");
+  const popupAddCart = document.getElementById("popupAddCart");
 
   products.forEach(product => {
-    const title = product.querySelector(".title").innerText;
     const cartBtn = product.querySelector(".cart-btn");
-    const inCart = cart.find(i => i.title === title);
-    cartBtn.style.background = inCart ? "green" : "var(--color-primary)";
-  });
-
-  cart.forEach((item, index) => {
-    const itemTotal = item.qty * item.price;
-    subtotal += itemTotal;
-
-    const cartItem = document.createElement('div');
-    cartItem.className = 'cart-item';
-    cartItem.innerHTML = `
-      <button class="remove-btn">&times;</button>
-      <img src="${item.img}" alt="${item.title}">
-      <div class="cart-details">
-        <span class="cart-title">${item.title}</span>
-        <div class="cart-qty-price">
-          <div class="quantity">
-            <button class="qty-btn minus">-</button>
-            <input type="number" value="${item.qty}" min="1">
-            <button class="qty-btn plus">+</button>
-          </div>
-          <span class="cart-price">${itemTotal}$</span>
-        </div>
-      </div>
-    `;
-
-    const qtyInput = cartItem.querySelector("input");
-    const minusBtn = cartItem.querySelector(".minus");
-    const plusBtn = cartItem.querySelector(".plus");
-    const removeBtn = cartItem.querySelector(".remove-btn");
-
-    minusBtn.addEventListener("click", () => { if(item.qty>1){ item.qty--; updateCart(); } });
-    plusBtn.addEventListener("click", () => { item.qty++; updateCart(); });
-    qtyInput.addEventListener("change", () => { item.qty = parseInt(qtyInput.value)||1; updateCart(); });
-
-    removeBtn.addEventListener("click", () => {
-      if(confirm(`هل أنت متأكد من إزالة "${item.title}" من السلة؟`)){
-        cart.splice(index, 1);
-        updateCart();
-      }
+    const title = product.querySelector(".title").innerText;
+    const img = product.querySelector("img").src;
+    const price = parseFloat(product.querySelector(".price").innerText.replace("$",""));
+    
+    // Open popup
+    product.addEventListener("click", e => {
+      if(e.target.closest(".cart-btn")) return;
+      popupImg.src = img;
+      popupTitle.innerText = title;
+      popupDesc.innerText = product.querySelector(".description").innerText;
+      popupPrice.innerText = product.querySelector(".price").innerText;
+      popupOverlay.classList.add("show");
     });
 
-    cartContainer.appendChild(cartItem);
+    // Add to cart
+    cartBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      const exists = cart.find(i => i.title === title);
+      if(exists) exists.qty++; 
+      else cart.push({title, img, price, qty:1});
+      updateCart();
+      showToast(`${title} تمت إضافته للسلة ✔️`);
+    });
   });
 
-  // Update subtotal and totals
-  subtotalPriceEl.innerText = subtotal + "$";
-  deliveryFeeEl.innerText = selectedDeliveryFee + "$";
-  totalPriceEl.innerText = (subtotal + selectedDeliveryFee) + "$";
+  popupClose.addEventListener("click", () => popupOverlay.classList.remove("show"));
+  popupOverlay.addEventListener("click", e => { if(e.target===popupOverlay) popupOverlay.classList.remove("show"); });
+  popupAddCart.addEventListener("click", () => {
+    const qty = parseInt(document.getElementById("popupQty").value) || 1;
+    const exists = cart.find(i => i.title === popupTitle.innerText);
+    if(exists) exists.qty += qty;
+    else cart.push({title: popupTitle.innerText, img: popupImg.src, price: parseFloat(popupPrice.innerText.replace("$","")), qty});
+    updateCart();
+    popupOverlay.classList.remove("show");
+    showToast(`${popupTitle.innerText} تمت إضافته للسلة ✔️`);
+  });
 
-  // Update cart badge
-  const cartBadge = document.getElementById("cartBadge");
-  const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-  cartBadge.innerText = totalItems;
-  cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
-}
+  // ===== Search =====
+  const searchToggle = document.getElementById("searchToggle");
+  const searchInput = document.getElementById("searchInput");
+  const searchContainer = document.querySelector("header .search");
 
-// Call once initially
-updateCart();</script>
-  <div id="toast" style="
-  visibility:hidden; min-width:200px; background:#333; color:#fff;
-  text-align:center; border-radius:8px; padding:12px; position:fixed;
-  bottom:80px; right:50%; transform:translateX(50%);
-  z-index:5000; font-size:14px; opacity:0; transition:opacity 0.5s;">
-</div>
-<script>
-function showToast(msg) {
-  const toast = document.getElementById("toast");
-  toast.innerText = msg;
-  toast.style.visibility = "visible";
-  toast.style.opacity = "1";
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    setTimeout(() => toast.style.visibility = "hidden", 500);
-  }, 2000);
-}
+  searchToggle.addEventListener("click", () => {
+    searchContainer.classList.toggle("active");
+    if (searchContainer.classList.contains("active")) {
+      searchInput.focus();
+      searchToggle.classList.replace("fa-search","fa-times");
+    } else {
+      searchInput.value = "";
+      products.forEach(p => p.style.display = "block");
+      searchToggle.classList.replace("fa-times","fa-search");
+    }
+  });
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+    products.forEach(p => {
+      const title = p.querySelector(".title").innerText.toLowerCase();
+      p.style.display = title.includes(query) ? "block" : "none";
+    });
+  });
+
+  // ===== Checkout =====
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  checkoutBtn.addEventListener("click", () => {
+    if(cart.length === 0) { alert("سلتك فارغة!"); return; }
+    const activeDelivery = document.querySelector(".delivery-btn.active");
+    const deliveryType = activeDelivery.innerText.trim();
+    const locationInput = userLocationInput.value.trim();
+    if(deliveryType.includes("توصيل") && !locationInput) { alert("يرجى إدخال موقع منزلكم قبل الدفع."); return; }
+    const phone = document.getElementById("userPhone").value.trim() || "لم يتم إدخال رقم";
+    const now = new Date();
+
+    let subtotal = cart.reduce((sum, i) => sum + i.qty*i.price, 0);
+    const discountAmount = subtotal * (discountPercent/100);
+    const discountedSubtotal = subtotal - discountAmount;
+
+    let receipt = `فاتورة الطلب:\n• الوقت: ${now.toLocaleString()}\n• رقم الهاتف: ${phone}\n• الموقع: ${locationInput || 'لم يتم إدخال موقع'}\n• طريقة التوصيل: ${deliveryType}\n\nالمنتجات:\n`;
+    cart.forEach(item => {
+      receipt += `• ${item.title} - ${item.price}$ - ${item.qty} - ${(item.price*item.qty).toFixed(2)}$\n`;
+    });
+    receipt += `\n-المجموع الفرعي: ${discountedSubtotal.toFixed(2)}$\n-رسوم التوصيل: ${selectedDeliveryFee}$\n-الإجمالي: ${(discountedSubtotal + selectedDeliveryFee).toFixed(2)}$`;
+
+    window.open(`https://wa.me/9647881552046?text=${encodeURIComponent(receipt)}`, "_blank");
+  });
+
+  // ===== Toast =====
+  function showToast(msg) {
+    const toast = document.getElementById("toast");
+    toast.innerText = msg;
+    toast.style.visibility = "visible";
+    toast.style.opacity = "1";
+    setTimeout(() => { toast.style.opacity="0"; setTimeout(()=>toast.style.visibility="hidden",500); }, 2000);
+  }
+
+  // ===== Init =====
+  updateCart();
 </script>
 </body>
 </html>
+
 
 
 

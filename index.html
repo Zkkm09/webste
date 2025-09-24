@@ -1,122 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>واجهة عربية</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Lemonada:wght@300..700&display=swap');
-:root {
-  --color-primary: #2563EB;
-  --color-secondary: #1E40AF;
-  --color-accent: #3B82F6;
-  --color-accent-2: #9333EA;
-  --color-dark: #111827;
-  --color-light: #F9FAFB;
-  --color-white: #FFFFFF;
-  --color-gray: #6B7280;
-  --color-primary-transparent: rgba(37, 99, 235, 0.85);
-  --color-border: #E5E7EB;
-  --color-shadow: rgba(0, 0, 0, 0.12);
-  --gradient-accent: linear-gradient(90deg, var(--color-accent), #0099FF, var(--color-accent-2));
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: "Lemonada", cursive; min-height: 100vh; background: var(--color-white); color: var(--color-dark); padding-top: 60px; padding-bottom: 70px; }
-header { position: fixed; top:0; right:0; width:100%; display:flex; justify-content:space-between; align-items:center; padding:8px 16px; background: var(--color-primary-transparent); backdrop-filter: blur(10px); z-index:1000; }
-header .logo img { height:40px; }
-header .search { font-size:20px; color:var(--color-white); cursor:pointer; }
-.page { display:none; padding:5px 0; min-height:100vh; }
-.page.active { display:block; }
-nav { position: fixed; bottom:0; right:0; width:100%; display:flex; justify-content: space-around; align-items:center; padding:8px 0; background: var(--color-primary-transparent); backdrop-filter: blur(10px); }
-nav .nav-item { display:flex; flex-direction:column; align-items:center; cursor:pointer; }
-nav .icon { width:40px; height:40px; border-radius:50%; background:var(--color-white); display:flex; justify-content:center; align-items:center; font-size:16px; color:var(--color-primary); box-shadow:0 2px 6px var(--color-shadow); transition:0.3s; }
-nav .active .icon { transform:scale(1.2); background:var(--gradient-accent); color:var(--color-white); border:2px solid var(--color-white); }
-nav span { font-size:12px; margin-top:4px; color:var(--color-light); }
-.categories { display:flex; flex-direction:row; gap:20px; padding:10px 16px; overflow-x:auto; scrollbar-width:none; }
-.categories::-webkit-scrollbar { display:none; }
-.category { flex:0 0 auto; text-align:center; cursor:pointer; }
-.category img { width:90px; height:90px; border-radius:50%; border:2px solid var(--color-primary); object-fit:cover; }
-.category span { display:block; margin-top:6px; font-size:14px; }
-.category.active img { border:3px dashed var(--color-primary); }
-.category.active span { color:var(--color-primary); }
-.divider { border:none; border-top:1px solid var(--color-border); margin:10px 0; }
-.products { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:16px; padding:10px 16px 80px; }
-.product { background: var(--color-light); border-radius: 10px; box-shadow: 0 2px 6px var(--color-shadow); text-align:center; padding:8px; transition: transform 0.3s; cursor:pointer; display:flex; flex-direction:column; align-items:center; }
-.product:hover { transform: translateY(-4px); }
-.product img { width:140px; height:140px; border-radius:8px; object-fit:contain; background:var(--color-white); flex-shrink:0; }
-.product .title-wrapper { display:flex; flex-direction:column; align-items:flex-start; width:100%; margin-top:6px; }
-.product .title { font-size:14px; }
-.product .price-cart { display:flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 4px; }
-.product .price-cart .price { font-weight:bold; color: var(--color-primary); }
-.product .price-cart .cart-btn { margin-top:0; }
-.product .cart-btn { display:flex; justify-content:center; align-items:center; width:28px; height:28px; border-radius:50%; background:var(--color-primary); color:white; font-size:14px; cursor:pointer; transition:0.3s; }
-.cart-container { padding: 24px; }
-.cart-item { display: flex; gap: 12px; align-items: center; background: var(--color-light); padding: 12px; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 2px 6px var(--color-shadow); position: relative; }
-.cart-item img { width: 80px; height: 80px; border-radius: 8px; object-fit: contain; background: var(--color-white); }
-.cart-details { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.cart-title { font-weight: bold; font-size: 16px; margin-bottom: 6px; }
-.cart-qty-price { display: flex; justify-content: space-between; align-items: center; }
-.quantity { display: flex; align-items: center; gap: 4px; }
-.quantity input { width: 40px; text-align: center; border: 1px solid var(--color-border); border-radius: 6px; padding: 2px 0; }
-.qty-btn { width: 24px; height: 24px; background: var(--color-primary); color: var(--color-white); border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.cart-price { font-weight: bold; color: var(--color-primary); }
-.cart-summary { margin:16px; padding:14px 16px; background:var(--color-light); border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
-.cart-summary div { display:flex; justify-content:space-between; margin-bottom:8px; }
-.cart-summary div.total { font-weight:bold; font-size:18px; margin-bottom:0; }
-.checkout-btn { width: 100%; padding: 16px 20px; background: var(--color-primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 30px; }
-.remove-btn { position: absolute; top: 8px; left: 8px; background: red; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-
-.delivery-options { display:flex; gap:16px; margin-top:8px; }
-.delivery-btn { flex:1; text-align:center; padding:10px 0; border-radius:8px; background:var(--color-light); color:var(--color-dark); cursor:pointer; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.12); transition:0.3s; display:flex; flex-direction:column; align-items:center; }
-.delivery-btn div { font-size:16px; margin-bottom:4px; }
-.delivery-btn small { font-size:12px; color:var(--color-gray); }
-.delivery-btn.active { background: var(--gradient-accent); color:white; }
-.delivery-btn.active small { color: rgba(255,255,255,0.9); }
-
-.product-popup-overlay { position: fixed; top:0; left:0; width:100%; height:100%; backdrop-filter: blur(6px); background: rgba(0,0,0,0.3); display: none; justify-content:center; align-items:center; z-index:2000; opacity:0; transition: opacity 0.3s ease; }
-.product-popup-overlay.show { display:flex; opacity:1; }
-.product-popup { background: var(--color-white); padding: 20px; border-radius:12px; max-width:300px; text-align:center; position:relative; box-shadow:0 4px 12px var(--color-shadow); transform: scale(0.8); transition: transform 0.3s ease; }
-.product-popup-overlay.show .product-popup { transform: scale(1); }
-.product-popup img { width:250px; height:250px; border-radius:8px; object-fit:contain; background:var(--color-white); }
-.product-popup span { display:block; font-weight:bold; font-size:16px; margin-bottom:4px; }
-.product-popup .description { display:block; font-size:14px; color:var(--color-gray); margin-bottom:8px; }
-.product-popup .price { display:block; font-size:16px; color:var(--color-primary); font-weight:bold; margin-bottom:8px; }
-.product-popup .close-btn { position:absolute; top:8px; right:10px; font-size:20px; cursor:pointer; color:var(--color-dark); }
-.product-popup button { width:100%; padding:6px 12px; border:none; border-radius:8px; background: var(--color-primary); color:white; font-weight:bold; cursor:pointer; }
-
-.search-overlay { position:fixed; top:0; left:0; width:100%; height:100%; backdrop-filter: blur(6px); background: rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:3000; }
-.search-overlay.show { display:flex; }
-.search-box { background: var(--color-white); padding:15px 20px; border-radius:12px; width:90%; max-width:400px; display:flex; align-items:center; position:relative; }
-.search-box input { width:100%; padding:8px 12px; border:1px solid var(--color-border); border-radius:8px; font-size:16px; }
-.search-box span { position:absolute; right:10px; font-size:24px; cursor:pointer; color:var(--color-dark); }
-header .search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-}
-
-header .search input {
-  display: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--color-border);
-  font-size: 14px;
-}
-
-header .search.active input {
-  display: block;
-}
-
-header .search.active i {
-  content: "\f00d"; /* font-awesome X icon */
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
-}
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>واجهة عربية</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="./static/style.css">
 </head>
 <body>
 
@@ -125,159 +14,166 @@ header .search.active i {
   <div class="search">
   <i class="fas fa-search" id="searchToggle"></i>
   <input type="text" id="searchInput" placeholder="ابحث عن المنتجات...">
-</div>
+  <i class="fas fa-sliders-h" id="filterToggle" title="فلترة"></i>
+  </div>
+
 </header>
 
 <main>
-<section id="home" class="page active">
-  <div class="categories">
-    <div class="category active" data-category="all">
-      <img src="./images/Untitled design (16).png" alt="الكل"><span>الكل</span>
-    </div>
-    <div class="category" data-category="electronics">
-      <img src="./images/Untitled design (17).png" alt="الكترونيات"><span>الكترونيات</span>
-    </div>
-    <div class="category" data-category="clothes">
-      <img src="https://via.placeholder.com/80" alt="ملابس"><span>ملابس</span>
-    </div>
-    <div class="category" data-category="kitchen">
-      <img src="https://via.placeholder.com/80" alt="مطبخ"><span>مطبخ</span>
-    </div>
-    <div class="category" data-category="kitchen">
-      <img src="https://via.placeholder.com/80" alt="مطبخ"><span>مطبخ</span>
-    </div>
-    <div class="category" data-category="kitchen">
-      <img src="https://via.placeholder.com/80" alt="مطبخ"><span>مطبخ</span>
-    </div>
-  </div>
-
-  <hr class="divider">
-<div style="padding:10px 16px;">
-  <label>فلترة بالسعر:</label>
-  <input type="number" id="minPrice" placeholder="من" style="width:80px; padding:6px; margin:0 4px;">
-  <input type="number" id="maxPrice" placeholder="إلى" style="width:80px; padding:6px; margin:0 4px;">
-  <button id="priceFilterBtn" style="padding:6px 12px; border:none; border-radius:6px; background:var(--color-primary); color:white;">تصفية</button>
-</div>
-  <div class="products">
-    <div class="product" data-category="electronics">
-      <img src="./images/logo.png" alt="هاتف ذكي">
-      <div class="title-wrapper">
-        <span class="title">هاتف ذكي</span>
-        <div class="price-cart">
-          <span class="price">250$</span>
-          <div class="cart-btn"><i class="fas fa-cart-plus"></i></div>
-        </div>
+  <section id="home" class="page active">
+    <div class="categories">
+      <div class="category active" data-category="all">
+        <img src="./images/Untitled design (16).png" alt="الكل"><span>الكل</span>
       </div>
-      <span class="description" style="display:none;">هاتف ذكي عالي الجودة مع شاشة 6.5 بوصة.</span>
-    </div>
-    <div class="product" data-category="clothes">
-      <img src="./images/Untitled design (16).png" alt="قميص">
-      <div class="title-wrapper">
-        <span class="title">قميص</span>
-        <div class="price-cart">
-          <span class="price">35$</span>
-          <div class="cart-btn"><i class="fas fa-cart-plus"></i></div>
-        </div>
+      <div class="category" data-category="electronics">
+        <img src="./images/Untitled design (17).png" alt="الكترونيات"><span>الكترونيات</span>
       </div>
-      <span class="description" style="display:none;">قميص قطني مريح للارتداء اليومي.</span>
-    </div>
-    <div class="product" data-category="kitchen">
-      <img src="./images/Untitled design (17).png" alt="خلاط">
-      <div class="title-wrapper">
-        <span class="title">خلاط</span>
-        <div class="price-cart">
-          <span class="price">60$</span>
-          <div class="cart-btn"><i class="fas fa-cart-plus"></i></div>
-        </div>
+      <div class="category" data-category="clothes">
+        <img src="https://via.placeholder.com/80" alt="ملابس"><span>ملابس</span>
       </div>
-      <span class="description" style="display:none;">خلاط كهربائي متعدد السرعات مع كوب زجاجي.</span>
+      <div class="category" data-category="kitchen">
+        <img src="https://via.placeholder.com/80" alt="مطبخ"><span>مطبخ</span>
+      </div>
+      <div class="category" data-category="kitchen">
+        <img src="https://via.placeholder.com/80" alt="مطبخ"><span>مطبخ</span>
+      </div>
+      <div class="category" data-category="kitchen">
+        <img src="https://via.placeholder.com/80" alt="مطبخ"><span>مطبخ</span>
+      </div>
     </div>
-  </div>
-</section>
 
-<section id="cart" class="page">
-  <h2>🛒 السلة</h2>
-  <div class="cart-container" id="cartContainer"></div>
+    <hr class="divider">
 
-<div style="margin:16px;">
-  <label for="userLocation" style="font-weight:bold;">موقعك:</label>
-  <div style="display:flex; gap:6px;">
-    <input type="text" id="userLocation" placeholder="أدخل موقعك أو استخدم موقعي"
-           style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
-    <button id="getLocationBtn" style="padding:10px 12px; border:none; border-radius:8px; background:var(--color-primary); color:white; cursor:pointer;">
-      📍 موقعي
-    </button>
-  </div>
-</div>
-
-<!-- ✅ Coupon Input Section -->
-<div style="margin:16px;">
-  <label for="couponCode" style="font-weight:bold;">كود الخصم:</label>
-  <div style="display:flex; gap:6px; margin-top:6px;">
-    <input type="text" id="couponCode" placeholder="أدخل الكود"
-           style="flex:1; padding:10px; border-radius:8px; border:1px solid #ccc;">
-    <button id="applyCouponBtn" style="padding:10px 14px; border:none; border-radius:8px; background:var(--color-primary); color:white; cursor:pointer;">
-      تطبيق
-    </button>
-  </div>
-
-<!-- ✅ Active Coupon Display -->
-<div id="activeCoupon" 
-     style="margin-top:10px; background:#e0f2fe; color:#1e3a8a; padding:8px 12px; border-radius:8px; display:none; justify-content:space-between; align-items:center;">
-  <span id="activeCouponText"></span>
-  <i class="fas fa-times" id="removeCoupon" style="cursor:pointer; color:red;"></i>
-</div>
-
-
-
-
-<div style="margin:16px;">
-  <label for="userPhone" style="font-weight:bold;">رقم الهاتف:</label>
-  <input type="tel" id="userPhone" placeholder="07XXXXXXXX"
-         style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;">
-</div>
-
-<div style="margin:16px;">
-  <label for="orderNotes" style="font-weight:bold;">ملاحظات:</label>
-  <textarea id="orderNotes" placeholder="أدخل ملاحظاتك"
-         style="width:100%; padding:10px; margin-top:6px; border-radius:8px; border:1px solid #ccc;"></textarea>
-</div>
-
-  <div style="margin:16px;">
-    <label style="font-weight:bold; display:block; margin-bottom:6px;">طريقة التوصيل:</label>
-    <div class="delivery-options">
-      <div class="delivery-btn active" data-fee="5"><div> توصيل</div><small>5$</small></div>
-      <div class="delivery-btn" data-fee="0"><div> استلام من المتجر</div><small></small></div>
+    <div class="products">
+      <div class="product" data-category="electronics">
+        <img src="./images/logo.png" alt="هاتف ذكي">
+        <div class="title-wrapper">
+          <span class="title">هاتف ذكي</span>
+          <div class="price-cart">
+            <span class="price">250$</span>
+            <div class="cart-btn"><i class="fas fa-cart-plus"></i></div>
+          </div>
+        </div>
+        <span class="description">هاتف ذكي عالي الجودة مع شاشة 6.5 بوصة.</span>
+      </div>
+      <div class="product" data-category="clothes">
+        <img src="./images/Untitled design (16).png" alt="قميص">
+        <div class="title-wrapper">
+          <span class="title">قميص</span>
+          <div class="price-cart">
+            <span class="price">35$</span>
+            <div class="cart-btn"><i class="fas fa-cart-plus"></i></div>
+          </div>
+        </div>
+        <span class="description">قميص قطني مريح للارتداء اليومي.</span>
+      </div>
+      <div class="product" data-category="kitchen">
+        <img src="./images/Untitled design (17).png" alt="خلاط">
+        <div class="title-wrapper">
+          <span class="title">خلاط</span>
+          <div class="price-cart">
+            <span class="price">60$</span>
+            <div class="cart-btn"><i class="fas fa-cart-plus"></i></div>
+          </div>
+        </div>
+        <span class="description">خلاط كهربائي متعدد السرعات مع كوب زجاجي.</span>
+      </div>
     </div>
+  </section>
+
+  <section id="cart" class="page">
+    <h2>🛒 السلة</h2>
+    <div class="cart-container" id="cartContainer"></div>
+
+    <div class="form-group">
+      <label for="userLocation">موقعك:</label>
+      <div class="input-btn">
+        <input type="text" id="userLocation" placeholder="أدخل موقعك أو استخدم موقعي">
+        <button id="getLocationBtn">موقعي</button>
+      </div>
+    </div>
+
+    <div class="form-group coupon-group">
+  <label for="couponCode">كود الخصم:</label>
+  <div class="input-btn">
+    <input type="text" id="couponCode" placeholder="أدخل الكود">
+    <button id="applyCouponBtn">تطبيق</button>
   </div>
-
-  <div class="cart-summary">
-  <div><span>المجموع الفرعي (قبل الخصم):</span><span id="originalSubtotal">0$</span></div>
-  <div><span>الخصم:</span><span id="discountAmount">0$</span></div>
-  <div><span>المجموع الفرعي (بعد الخصم):</span><span id="subtotalPrice">0$</span></div>
-  <div><span>رسوم التوصيل:</span><span id="deliveryFee">0$</span></div>
-  <div class="total"><span>الإجمالي:</span><span id="totalPrice">0$</span></div>
+  <div id="activeCoupon">
+    <span id="activeCouponText"></span>
+    <i class="fas fa-times" id="removeCoupon"></i>
   </div>
+</div>
 
 
-  <button class="checkout-btn" id="checkoutBtn">الانتقال للدفع</button>
-</section>
 
-<section id="profile" class="page">
-  <h2>👤 معلوماتي</h2>
-  <p>هذه هي صفحتك الشخصية.</p>
-</section>
+    <div class="form-group">
+      <label for="userPhone">رقم الهاتف:</label>
+      <input type="tel" id="userPhone" placeholder="07XXXXXXXX">
+    </div>
+
+    <div class="form-group">
+      <label for="orderNotes">ملاحظات:</label>
+      <textarea id="orderNotes" placeholder="أدخل ملاحظاتك"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>طريقة التوصيل:</label>
+      <div class="delivery-options">
+        <div class="delivery-btn active" data-fee="5"><div> توصيل</div><small>5$</small></div>
+        <div class="delivery-btn" data-fee="0"><div>استلام</div><small></small></div>
+      </div>
+    </div>
+
+    <div class="cart-summary">
+      <div><span>المجموع الفرعي (قبل الخصم):</span><span id="originalSubtotal">0$</span></div>
+      <div><span>الخصم:</span><span id="discountAmount">0$</span></div>
+      <div><span>المجموع الفرعي (بعد الخصم):</span><span id="subtotalPrice">0$</span></div>
+      <div><span>رسوم التوصيل:</span><span id="deliveryFee">0$</span></div>
+      <div class="total"><span>الإجمالي:</span><span id="totalPrice">0$</span></div>
+    </div>
+
+    <button class="checkout-btn" id="checkoutBtn">الانتقال للدفع</button>
+  </section>
+
+  <section id="profile" class="page">
+    <h2>👤 معلوماتي</h2>
+    <p>هذه هي صفحتك الشخصية.</p>
+  </section>
 </main>
+
+<div id="filterOverlay" class="filter-overlay">
+  <div class="filter-panel">
+    <span id="filterClose" class="close-btn">&times;</span>
+    <h3>فلترة المنتجات</h3>
+    <div class="filter-group">
+      <label>السعر من:</label>
+      <input type="number" id="minPrice" placeholder="من">
+      <label>إلى:</label>
+      <input type="number" id="maxPrice" placeholder="إلى">
+    </div>
+    <div class="filter-group">
+      <label>ترتيب حسب:</label>
+      <select id="sortOrder">
+        <option value="none">افتراضي</option>
+        <option value="asc">الأقل سعرًا</option>
+        <option value="desc">الأعلى سعرًا</option>
+      </select>
+    </div>
+    <button id="applyFilterBtn">تطبيق الفلاتر</button>
+  </div>
+</div>
+
 
 <nav>
   <div class="nav-item active" data-target="home"><div class="icon"><i class="fas fa-home"></i></div><span>الرئيسية</span></div>
-<div class="nav-item" data-target="cart">
-  <div class="icon" style="position:relative;">
-    <i class="fas fa-shopping-cart"></i>
-    <span id="cartBadge" style="position:absolute; top:-6px; right:-6px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; display:none;">0</span>
+  <div class="nav-item" data-target="cart">
+    <div class="icon">
+      <i class="fas fa-shopping-cart"></i>
+      <span id="cartBadge">0</span>
+    </div>
+    <span>السلة</span>
   </div>
-  <span>السلة</span>
-</div>
   <div class="nav-item" data-target="profile"><div class="icon"><i class="fas fa-user"></i></div><span>معلوماتي</span></div>
 </nav>
 
@@ -289,15 +185,21 @@ header .search.active i {
     <span class="description" id="popupDesc"></span>
     <span class="price" id="popupPrice"></span>
 
-<div style="margin:10px 0;">
-  <label style="font-weight:bold;">الكمية:</label>
-  <input type="number" id="popupQty" value="1" min="1"
-         style="width:80px; padding:6px; margin-top:4px; border-radius:6px; border:1px solid #ccc; text-align:center;">
-</div>
-
-<button id="popupAddCart">اضف للسلة</button>
+    <div class="form-group">
+  <label>الكمية:</label>
+  <div class="quantity">
+    <button class="qty-btn minus" id="popupMinus">-</button>
+    <span id="popupQty">1</span>
+    <button class="qty-btn plus" id="popupPlus">+</button>
   </div>
 </div>
+
+
+    <button id="popupAddCart">اضف للسلة</button>
+  </div>
+</div>
+
+<div id="toast"></div>
 
 <script>
 /* ==============================
@@ -437,8 +339,14 @@ totalPriceEl.innerText = (discountedSubtotal + selectedDeliveryFee).toFixed(2) +
   // Update cart badge
   const cartBadge = document.getElementById("cartBadge");
   const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-  cartBadge.innerText = totalItems;
-  cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
+cartBadge.innerText = totalItems;
+cartBadge.style.display = totalItems > 0 ? "inline-block" : "none";
+
+// Pop animation
+cartBadge.classList.remove("pop");
+void cartBadge.offsetWidth; // trigger reflow
+cartBadge.classList.add("pop");
+
 }
 
 /* ==============================
@@ -510,6 +418,22 @@ const popupPrice = document.getElementById("popupPrice");
 const popupClose = document.getElementById("popupClose");
 const popupAddCart = document.getElementById("popupAddCart");
 
+const popupQtyEl = document.getElementById("popupQty");
+const popupMinus = document.getElementById("popupMinus");
+const popupPlus = document.getElementById("popupPlus");
+
+let popupQty = 1;
+
+popupMinus.addEventListener("click", () => {
+  if (popupQty > 1) popupQty--;
+  popupQtyEl.innerText = popupQty;
+});
+
+popupPlus.addEventListener("click", () => {
+  popupQty++;
+  popupQtyEl.innerText = popupQty;
+});
+
 products.forEach(product => {
   const cartBtn = product.querySelector(".cart-btn");
   const price = parseFloat(product.querySelector(".price").innerText.replace("$",""));
@@ -518,16 +442,31 @@ products.forEach(product => {
 
   product.addEventListener("click", e => {
     if(e.target.closest(".cart-btn")) return;
+
     popupImg.src = img;
     popupTitle.innerText = title;
     popupDesc.innerText = product.querySelector(".description").innerText;
     popupPrice.innerText = product.querySelector(".price").innerText;
+
+    // Show current cart quantity if product is in cart
+    const inCart = cart.find(i => i.title === title);
+    if(inCart){
+      popupQty = inCart.qty;
+      popupAddCart.innerText = "تحديث السلة";
+      popupAddCart.style.background = "green";
+    } else {
+      popupQty = 1;
+      popupAddCart.innerText = "اضف للسلة";
+      popupAddCart.style.background = ""; // default
+    }
+
+    popupQtyEl.innerText = popupQty;
     popupOverlay.classList.add("show");
   });
 
   cartBtn.addEventListener("click", e => {
     e.stopPropagation();
-    const exists = cart.find(i=>i.title===title);
+    const exists = cart.find(i => i.title === title);
     if(exists){ exists.qty++; } else { cart.push({title,img,price,qty:1}); }
     updateCart();
     showToast(title + " تمت إضافته للسلة ✔️");
@@ -535,23 +474,30 @@ products.forEach(product => {
 });
 
 popupClose.addEventListener("click", () => popupOverlay.classList.remove("show"));
-popupOverlay.addEventListener("click", e => { if(e.target===popupOverlay) popupOverlay.classList.remove("show"); });
+popupOverlay.addEventListener("click", e => { if(e.target === popupOverlay) popupOverlay.classList.remove("show"); });
+
 popupAddCart.addEventListener("click", () => {
-  const qty = parseInt(document.getElementById("popupQty").value) || 1;
   const exists = cart.find(i => i.title === popupTitle.innerText);
   if (exists) {
-    exists.qty += qty;
+    exists.qty = popupQty; // update to popup quantity
   } else {
     cart.push({
       title: popupTitle.innerText,
       img: popupImg.src,
       price: parseFloat(popupPrice.innerText.replace("$","")),
-      qty: qty
+      qty: popupQty
     });
   }
+
   updateCart();
   popupOverlay.classList.remove("show");
-  showToast(popupTitle.innerText + " تمت إضافته للسلة ✔️");
+  showToast(popupTitle.innerText + " تمت تحديثه/إضافته للسلة ✔️");
+
+  // Reset popup
+  popupQty = 1;
+  popupQtyEl.innerText = "1";
+  popupAddCart.innerText = "اضف للسلة";
+  popupAddCart.style.background = "";
 });
 
 /* ==============================
@@ -579,6 +525,68 @@ searchInput.addEventListener("input", () => {
     const title = p.querySelector('.title').innerText.toLowerCase();
     p.style.display = title.includes(query)?'block':'none';
   });
+});
+// Filter overlay logic
+const filterToggle = document.getElementById("filterToggle");
+const filterOverlay = document.getElementById("filterOverlay");
+const filterClose = document.getElementById("filterClose");
+const applyFilterBtn = document.getElementById("applyFilterBtn");
+const minPriceInput = document.getElementById("minPrice");
+const maxPriceInput = document.getElementById("maxPrice");
+const sortOrderSelect = document.getElementById("sortOrder");
+
+filterToggle.addEventListener("click", () => {
+  if (filterOverlay.classList.contains("show")) {
+    // If already open, close it
+    filterOverlay.classList.remove("show");
+    setTimeout(() => filterOverlay.style.display = "none", 300);
+  } else {
+    // If closed, open it
+    filterOverlay.style.display = "block";
+    setTimeout(() => filterOverlay.classList.add("show"), 10);
+  }
+});
+
+
+filterClose.addEventListener("click", () => {
+  filterOverlay.classList.remove("show");
+  setTimeout(() => filterOverlay.style.display = "none", 300);
+});
+
+filterOverlay.addEventListener("click", e => {
+  if(e.target === filterOverlay) {
+    filterOverlay.classList.remove("show");
+    setTimeout(() => filterOverlay.style.display = "none", 300);
+  }
+});
+
+applyFilterBtn.addEventListener("click", () => {
+  const min = parseFloat(minPriceInput.value) || 0;
+  const max = parseFloat(maxPriceInput.value) || Infinity;
+  const order = sortOrderSelect.value;
+
+  let filteredProducts = Array.from(products).filter(p => {
+    const price = parseFloat(p.querySelector(".price").innerText.replace("$",""));
+    return price >= min && price <= max;
+  });
+
+  if(order === "asc") {
+    filteredProducts.sort((a,b) => parseFloat(a.querySelector(".price").innerText.replace("$","")) - parseFloat(b.querySelector(".price").innerText.replace("$","")));
+  } else if(order === "desc") {
+    filteredProducts.sort((a,b) => parseFloat(b.querySelector(".price").innerText.replace("$","")) - parseFloat(a.querySelector(".price").innerText.replace("$","")));
+  }
+
+const productsContainer = document.querySelector(".products");
+
+// Clear container first
+productsContainer.innerHTML = "";
+
+// Append filtered and sorted products
+filteredProducts.forEach(p => productsContainer.appendChild(p));
+
+  // Close overlay
+  filterOverlay.classList.remove("show");
+  setTimeout(() => filterOverlay.style.display = "none", 300);
 });
 
 /* ============================== 
@@ -656,22 +664,5 @@ function showToast(msg) {
 ================================= */
 updateCart();
 </script>
-<div id="toast" style="
-  visibility:hidden;
-  min-width:250px;
-  background:#333;
-  color:#fff;
-  text-align:center;
-  border-radius:8px;
-  padding:12px;
-  position:fixed;
-  bottom:80px;
-  right:50%;
-  transform:translateX(50%);
-  z-index:9999;
-  opacity:0;
-  transition:opacity 0.5s ease;
-"></div>
-
 </body>
 </html>
